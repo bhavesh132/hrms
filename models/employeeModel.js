@@ -1,0 +1,85 @@
+const mongoose = require("mongoose");
+const validator = require("validator");
+const bcrypt = require("bcrypt");
+
+const EmployeeSchema = new mongoose.Schema({
+    emp_no:{
+        type: Number,
+        required: true, 
+        unique: true,
+        validate: {
+            validator: Number.isInteger,
+            message: '{VALUE} is not an integer value'
+        }
+    },
+    firstName:{
+        type: String,
+        required: true,
+        length: 20
+    },
+    lastName: {
+        type: String,
+        length: 20
+    },
+    userName: {
+        type: String,
+        required: true,
+        length: 45,
+        unique: true
+    },
+    email: {
+        type: String,
+        length: 50,
+        required: true,
+        unique: true,
+        validate: {
+            validator: (value) => {validator.isEmail(value)},
+            message: `Invalid Email Address`
+        }
+    },
+    password: {
+        type: String,
+        required: true,
+        min: [8, 'Enter at least 8 Characters']
+    },
+    dateOfBirth: {type: Date},
+    department: {type: String},
+    position: {type: String},
+    supervisor: {
+        type: mongoose.Schema.Types.ObjectId, ref: 'Employee'
+    },
+    address: {
+        street: {type: String},
+        city: {type: String},
+        state: {type: String}
+    },
+    nationality: {type: String},
+    location: {type: String},
+    dateOfJoining: {type: Date},
+    status: {
+        type: String,
+        enum: ['Full-Time', 'Part-Time']
+    },
+}, {timestamps: true});
+
+EmployeeSchema.pre('save', async function(next){
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = bcrypt.hash(this.password, salt);
+    this.password = hashedPassword;
+    next();
+});
+
+EmployeeSchema.methods.isValidPassword = async function(password){
+    try{
+        return await bcrypt.compare(password, this.password);
+    }catch (err){
+        throw err;
+    }
+}
+
+
+const Employee = mongoose.model('Employee', EmployeeSchema);
+
+
+module.exports = Employee;
+
