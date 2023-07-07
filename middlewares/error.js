@@ -1,10 +1,10 @@
 const ErrorHandler = require('../helpers/errorHandler');
 
 module.exports = (err, req, res, next) => {
-    err.status = err.status || 500;
-    err.message = err.message || "Internal Server Error"
+    err.statusCode = err.statusCode || 500;
+    err.message = err.message || "Internal Server Error";
 
-    res.status = (err.status).json({
+    res.status(err.statusCode).json({
         sucess: false,
         message: err.message
     })

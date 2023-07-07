@@ -7,10 +7,11 @@ const employeeRoutes =require('./routes/employeeRoutes');
 
 const app = express();
 app.use(express.json());
+app.use(errors);
 app.use(bodyParser.json({limit: '30mb', extended: true}));
 app.use(bodyParser.urlencoded({limit: '30mb', extended: true}));
 app.use(cors());
-app.use(errors);
+
 
 
 // Employee Routes

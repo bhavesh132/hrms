@@ -40,7 +40,8 @@ const EmployeeSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        min: [8, 'Enter at least 8 Characters']
+        min: [8, 'Enter at least 8 Characters'],
+        select: false
     },
     avatar: {
         public_id:{
@@ -94,12 +95,8 @@ EmployeeSchema.methods.getJWTToken = function(){
     })
 }
 
-EmployeeSchema.methods.isValidPassword = async function(password){
-    try{
-        return await bcrypt.compare(password, this.password);
-    }catch (err){
-        throw err;
-    }
+EmployeeSchema.methods.comparePassword = async function(password){
+        return await bcrypt.compare(password, this.password); 
 }
 
 

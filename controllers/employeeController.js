@@ -4,7 +4,6 @@ const catchAsync = require('../middlewares/catchAsync');
 const ApiFeatures = require('../helpers/apiFeatures');
 
 // Add an employee
-
 exports.createEmployee = catchAsync(async (req, res, next)=>{
         const api = new ApiFeatures(Employee.create(req.body), req.query)
     
@@ -40,5 +39,30 @@ exports.getEmployeeDetails = catchAsync(async (req,res,next)=>{
     res.status(200).json({
         success:true,
         employee
+    })
+})
+
+exports.employeeLogin = catchAsync(async (req, res, next)=>{
+
+    const {email, password} = req.body;
+
+    // Validation of email and password
+    if(!email || !password){
+        return next(new ErrorHandler("Please enter Email and Password", 400))
+    }
+
+    const employee = await Employee.findOne({ email }).select("+password");
+
+    const isPasswordMatched = employee.comparePassword(password);
+
+    if(!user || !isPasswordMatched){
+        return next(new ErrorHandler("Invalid Email or Password", 401))
+    }
+
+    const token = employee.getJWTToken;
+
+    res.status(200).json({
+        success: true,
+        token
     })
 })
