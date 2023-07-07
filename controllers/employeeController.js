@@ -15,24 +15,30 @@ exports.createEmployee = catchAsync(async (req, res, next)=>{
         })
 });
 
-exports.signIn = async (req, res, next)=>{
-    try{
-        const employee = await Employee.findOne({userName: req.body.userName})
-        if(!employee) return next();
+exports.getAllEmployees = catchAsync(async (req, res, next)=>{
+    const resultPerPage = 15
 
-        const isMatch = await employee.isValidPassword(req.body.password)
+    const count = await Employee.countDocuments();
 
-        if(!isMatch) return next();
+    const api = new ApiFeatures(Employee.find(), req.query).search().filter().pagination(resultPerPage);
+    const employees = await api.query
+    res.status(201).json({
+        success: true,
+        employees,
+        count
+    })
 
-        const accessToken = await signAccessToken(employee.id)
+})
 
-        res.send({
-            success: true,
-            employee,
-            accessToken
-        })
+exports.getEmployeeDetails = catchAsync(async (req,res,next)=>{
+    const employee = await Employee.findById(req.params.id);
 
-    } catch (err){
-        next(err)
+    if (!employee){
+        return next(new ErrorHandler("Employee Does not Exists", 404));
     }
-}
+
+    res.status(200).json({
+        success:true,
+        employee
+    })
+})

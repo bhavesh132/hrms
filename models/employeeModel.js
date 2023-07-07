@@ -42,6 +42,21 @@ const EmployeeSchema = new mongoose.Schema({
         required: true,
         min: [8, 'Enter at least 8 Characters']
     },
+    avatar: {
+        public_id:{
+            type: String,
+            required: true
+        },
+        url: {
+            type: String,
+            required: true
+        }
+    },
+    role: {
+        type: String,
+        required: true,
+        default: "user"
+    },
     dateOfBirth: {type: Date},
     department: {type: String},
     position: {type: String},
@@ -63,11 +78,21 @@ const EmployeeSchema = new mongoose.Schema({
 }, {timestamps: true});
 
 EmployeeSchema.pre('save', async function(next){
+
+    if(!this.isModified("password")){
+        next();
+    }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = bcrypt.hash(this.password, salt);
     this.password = hashedPassword;
     next();
 });
+
+EmployeeSchema.methods.getJWTToken = function(){
+    return jwt.sign({id: this._id},process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: process.env.JWT_EXPIRE
+    })
+}
 
 EmployeeSchema.methods.isValidPassword = async function(password){
     try{
