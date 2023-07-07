@@ -1,5 +1,5 @@
 const Employee = require('../models/employeeModel');
-const ErrorHandler = require('../helpers/errorHandler');
+const CustomErrorHandler = require('../helpers/CustomErrorHandler');
 const catchAsync = require('../middlewares/catchAsync');
 const ApiFeatures = require('../helpers/apiFeatures');
 
@@ -33,7 +33,7 @@ exports.getEmployeeDetails = catchAsync(async (req,res,next)=>{
     const employee = await Employee.findById(req.params.id);
 
     if (!employee){
-        return next(new ErrorHandler("Employee Does not Exists", 404));
+        return next(new CustomErrorHandler("Employee Does not Exists", 404));
     }
 
     res.status(200).json({
@@ -48,7 +48,7 @@ exports.employeeLogin = catchAsync(async (req, res, next)=>{
 
     // Validation of email and password
     if(!email || !password){
-        return next(new ErrorHandler("Please enter Email and Password", 400))
+        return next(new CustomErrorHandler("Please enter Email and Password", 400))
     }
 
     const employee = await Employee.findOne({ email }).select("+password");
@@ -56,7 +56,7 @@ exports.employeeLogin = catchAsync(async (req, res, next)=>{
     const isPasswordMatched = employee.comparePassword(password);
 
     if(!user || !isPasswordMatched){
-        return next(new ErrorHandler("Invalid Email or Password", 401))
+        return next(new CustomErrorHandler("Invalid Email or Password", 401))
     }
 
     const token = employee.getJWTToken;

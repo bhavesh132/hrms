@@ -1,11 +1,12 @@
-const ErrorHandler = require('../helpers/errorHandler');
+const CustomErrorHandler = require('../helpers/CustomErrorHandler');
 
 module.exports = (err, req, res, next) => {
-    err.statusCode = err.statusCode || 500;
-    err.message = err.message || "Internal Server Error";
-
-    res.status(err.statusCode).json({
-        sucess: false,
-        message: err.message
-    })
-}
+    if (err instanceof CustomErrorHandler) {
+        res.status(err.statusCode).json({  
+            sucess: false,
+            message: err.message });
+    } else {
+        // Handle other types of errors or fallback
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
