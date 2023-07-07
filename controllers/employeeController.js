@@ -1,21 +1,19 @@
 const Employee = require('../models/employeeModel');
-const { signAccessToken } = require('../helpers/jwtHelper')
+const ErrorHandler = require('../helpers/errorHandler');
+const catchAsync = require('../middlewares/catchAsync');
+const ApiFeatures = require('../helpers/apiFeatures');
 
 // Add an employee
 
-exports.createEmployee = async (req, res, next)=>{
-    try{
-        const employee = await Employee.create(req.body);
-        const accessToken = signAccessToken(employee.id)
-        res.json({
-            sucess:true, 
-            employee,
-            accessToken        
+exports.createEmployee = catchAsync(async (req, res, next)=>{
+        const api = new ApiFeatures(Employee.create(req.body), req.query)
+    
+        const employee = await api.query
+        res.status(201).json({
+            success: true,
+            employee
         })
-    } catch (err){
-        res.status(500).json({success: false, message: `Internal error ${err}`})
-    }  
-};
+});
 
 exports.signIn = async (req, res, next)=>{
     try{
