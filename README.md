@@ -1,7 +1,7 @@
 # HRMS
 
 ## Install the NPM Packages
-In the command Line
+In the command Line, run:
 ````
 npm install
 ````
