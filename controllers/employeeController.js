@@ -2,6 +2,7 @@ const Employee = require('../models/employeeModel');
 const CustomErrorHandler = require('../helpers/CustomErrorHandler');
 const catchAsync = require('../middlewares/catchAsync');
 const ApiFeatures = require('../helpers/apiFeatures');
+const sendToken = require('../helpers/sendToken');
 
 // Add an employee
 exports.createEmployee = catchAsync(async (req, res, next)=>{
@@ -21,7 +22,7 @@ exports.getAllEmployees = catchAsync(async (req, res, next)=>{
 
     const api = new ApiFeatures(Employee.find(), req.query).search().filter().pagination(resultPerPage);
     const employees = await api.query
-    res.status(201).json({
+    res.status(200).json({
         success: true,
         employees,
         count
@@ -62,9 +63,10 @@ exports.employeeLogin = catchAsync(async (req, res, next)=>{
         return next(new CustomErrorHandler("Invalid Email or Password", 401))
     }
 
-    const token = await employee.getJWTToken();
-    res.status(200).json({
-        success: true,
-        token
-    })
+    sendToken(employee,200,res)
+    // const token = await employee.getJWTToken();
+    // res.status(200).json({
+    //     success: true,
+    //     token
+    // })
 })
