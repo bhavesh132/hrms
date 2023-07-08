@@ -31,7 +31,6 @@ exports.getAllEmployees = catchAsync(async (req, res, next)=>{
 })
 
 exports.getEmployeeDetails = catchAsync(async (req,res,next)=>{
-    console.log(req.params.id)
     const employee = await Employee.findById(req.params.id);
 
     if (!employee){

@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const errorHandler = require('./middlewares/error');
 const cookieParser = require("cookie-parser")
-
+const roleManagementRoutes = require('./routes/roleManagementRoutes')
 const employeeRoutes =require('./routes/employeeRoutes');
 
 const app = express();
@@ -15,7 +15,8 @@ app.use(cookieParser())
 
 
 // Employee Routes
-app.use('/api', employeeRoutes);
+app.use('/api/employee', employeeRoutes);
+app.use('/api/role', roleManagementRoutes);
 
 
 app.use(errorHandler);

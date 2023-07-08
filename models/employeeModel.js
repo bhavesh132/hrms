@@ -47,11 +47,6 @@ const EmployeeSchema = new mongoose.Schema({
     avatar: {
             type: String
     },
-    role: {
-        type: String,
-        required: true,
-        default: "user"
-    },
     dateOfBirth: {type: Date},
     department: {type: String},
     position: {type: String},
