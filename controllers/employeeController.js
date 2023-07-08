@@ -31,6 +31,7 @@ exports.getAllEmployees = catchAsync(async (req, res, next)=>{
 })
 
 exports.getEmployeeDetails = catchAsync(async (req,res,next)=>{
+    console.log(req.params.id)
     const employee = await Employee.findById(req.params.id);
 
     if (!employee){
@@ -64,9 +65,18 @@ exports.employeeLogin = catchAsync(async (req, res, next)=>{
     }
 
     sendToken(employee,200,res)
-    // const token = await employee.getJWTToken();
-    // res.status(200).json({
-    //     success: true,
-    //     token
-    // })
+})
+
+// Logout User
+exports.employeeLogout = catchAsync(async (req, res, next) => {
+
+    res.cookie("token", null, {
+        expires: new Date(Date.now()),
+        httpOnly: true
+    })
+
+    res.status(200).json({
+        success: true,
+        message: "You have been logged out successfully!"
+    })
 })

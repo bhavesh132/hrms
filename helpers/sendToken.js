@@ -1,5 +1,6 @@
-const sendToken = (employee, statusCode, res)=>{
-    const token = employee.getJWTToken();
+
+const sendToken = async (employee, statusCode, res)=>{
+    const token = await employee.getJWTToken();
 
     // Options for Cookies
     const options = {
@@ -8,10 +9,10 @@ const sendToken = (employee, statusCode, res)=>{
         ),
         httpOnly: true, 
     }
-
     res.status(statusCode).cookie('token', token, options).json({
         success: true,
-        employee, token
+        token,
+        employee
     })
 }
 
