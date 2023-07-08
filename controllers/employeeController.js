@@ -53,14 +53,16 @@ exports.employeeLogin = catchAsync(async (req, res, next)=>{
 
     const employee = await Employee.findOne({ email }).select("+password");
 
-    const isPasswordMatched = employee.comparePassword(password);
+    if(!employee){
+        return next(new CustomErrorHandler("Invalid Email or Password", 401))
+    }
+    const isPasswordMatched = await employee.comparePassword(password);
 
-    if(!user || !isPasswordMatched){
+    if(!isPasswordMatched){
         return next(new CustomErrorHandler("Invalid Email or Password", 401))
     }
 
-    const token = employee.getJWTToken;
-
+    const token = await employee.getJWTToken();
     res.status(200).json({
         success: true,
         token

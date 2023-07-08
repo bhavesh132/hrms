@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken")
 
 const EmployeeSchema = new mongoose.Schema({
     emp_no:{
@@ -44,14 +45,7 @@ const EmployeeSchema = new mongoose.Schema({
         select: false
     },
     avatar: {
-        public_id:{
-            type: String,
-            required: true
-        },
-        url: {
-            type: String,
-            required: true
-        }
+            type: String
     },
     role: {
         type: String,
@@ -82,21 +76,27 @@ EmployeeSchema.pre('save', async function(next){
 
     if(!this.isModified("password")){
         next();
+        console.log("not called")
     }
+    console.log(this.password)
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = bcrypt.hash(this.password, salt);
+    const hashedPassword = await bcrypt.hash(this.password, salt);
     this.password = hashedPassword;
+
     next();
 });
 
-EmployeeSchema.methods.getJWTToken = function(){
-    return jwt.sign({id: this._id},process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE
-    })
+EmployeeSchema.methods.comparePassword = async function(password){
+        const matched =  await bcrypt.compare(password, this.password);
+        return matched; 
 }
 
-EmployeeSchema.methods.comparePassword = async function(password){
-        return await bcrypt.compare(password, this.password); 
+EmployeeSchema.methods.getJWTToken = async function(){
+    const token =  await jwt.sign({id: this._id},process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: process.env.JWT_EXPIRE
+    })
+
+    return token
 }
 
 
