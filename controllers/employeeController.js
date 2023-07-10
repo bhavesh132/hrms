@@ -7,7 +7,6 @@ const sendToken = require('../helpers/sendToken');
 // Add an employee
 exports.createEmployee = catchAsync(async (req, res, next)=>{
         const api = new ApiFeatures(Employee.create(req.body), req.query)
-    
         const employee = await api.query
         res.status(201).json({
             success: true,
@@ -15,6 +14,8 @@ exports.createEmployee = catchAsync(async (req, res, next)=>{
         })
 });
 
+
+// Get all employees Details --Administrator
 exports.getAllEmployees = catchAsync(async (req, res, next)=>{
     const resultPerPage = 15
 
@@ -30,6 +31,7 @@ exports.getAllEmployees = catchAsync(async (req, res, next)=>{
 
 })
 
+// Get a particular employee details --administrator
 exports.getEmployeeDetails = catchAsync(async (req,res,next)=>{
     const employee = await Employee.findById(req.params.id);
 
@@ -43,6 +45,8 @@ exports.getEmployeeDetails = catchAsync(async (req,res,next)=>{
     })
 })
 
+
+// Login a user
 exports.employeeLogin = catchAsync(async (req, res, next)=>{
 
     const {email, password} = req.body;
@@ -79,3 +83,18 @@ exports.employeeLogout = catchAsync(async (req, res, next) => {
         message: "You have been logged out successfully!"
     })
 })
+
+exports.employeeProfile = catchAsync(async (req, res, next)=> {
+    const employee = await Employee.findById(req.employee._id)
+
+    if(!employee){
+        next(new CustomErrorHandler("Details not found!", 404))
+    }
+
+    res.status(200).json({
+        status: "success",
+        employee
+    })
+
+});
+

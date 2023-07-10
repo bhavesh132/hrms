@@ -19,23 +19,18 @@ exports.isAuthenticated = catchAsync(async (req, res, next) =>{
 })
 
 
-exports.authorizedUser = () => {
-    return async (req, res, next) => {
-        const empID = req.employee._id
-        if(req.params.id === empID){
-            next()
-        }
-        next(new CustomErrorHandler("You do not have authorization to access this resource", 401))
-    }
-}
-
 exports.authorizeRoles = (...roles)=> {
     return async (req, res, next) => {
         const empID = req.employee._id
         const empRole = await RoleManagement.findOne({AssignedEmployee: {$in: [empID]}})
-        if (roles.includes(empRole.role)===false){
-            next(new CustomErrorHandler(`Role: ${empRole.role} is not allowed to access this resource!`, 401))
+        if(empRole !== null){
+            if (roles.includes(empRole.role)===false){
+                next(new CustomErrorHandler(`Role: ${empRole.role} is not allowed to access this resource!`, 401))
+            }
+            next();
+        }else{
+            next(new CustomErrorHandler(`You are not allowed to access this resource!`, 401))
         }
-        next();
+        
     }
 }

@@ -1,5 +1,5 @@
 const express = require("express");
-const { createEmployee, employeeLogin, employeeLogout, getAllEmployees, getEmployeeDetails } = require('../controllers/employeeController');
+const { createEmployee, employeeLogin, employeeLogout, getAllEmployees, getEmployeeDetails, employeeProfile } = require('../controllers/employeeController');
 const { isAuthenticated, authorizeRoles } = require("../middlewares/auth");
 
 const router = express.Router()
@@ -9,6 +9,8 @@ router.route('/getAllEmployees').get(isAuthenticated, authorizeRoles("System Adm
 router.route('/getEmployee/:id').get(isAuthenticated, authorizeRoles("System Administrator") ,getEmployeeDetails)
 
 router.route('/addEmployee').post(isAuthenticated, authorizeRoles("System Administrator"),createEmployee);
+
+router.route('/me').get(isAuthenticated, employeeProfile)
 
 router.route("/login").post(employeeLogin);
 

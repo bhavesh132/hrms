@@ -1,8 +1,6 @@
-const mongoose = require("mongoose");
 const RoleManagement = require("../models/roleManagementModel");
 const catchAsync = require("../middlewares/catchAsync");
 const CustomErrorHandler = require("../helpers/CustomErrorHandler");
-const Employee = require("../models/employeeModel");
 
 exports.createRole = catchAsync(async (req, res, next)=>{
     const {role} = req.body
