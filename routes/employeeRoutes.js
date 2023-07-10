@@ -1,5 +1,5 @@
 const express = require("express");
-const { createEmployee, employeeLogin, employeeLogout, getAllEmployees, getEmployeeDetails, employeeProfile } = require('../controllers/employeeController');
+const { createEmployee, employeeLogin, employeeLogout, getAllEmployees, getEmployeeDetails, employeeProfile, forgotPassword, resetPassword } = require('../controllers/employeeController');
 const { isAuthenticated, authorizeRoles } = require("../middlewares/auth");
 
 const router = express.Router()
@@ -13,6 +13,10 @@ router.route('/addEmployee').post(isAuthenticated, authorizeRoles("System Admini
 router.route('/me').get(isAuthenticated, employeeProfile)
 
 router.route("/login").post(employeeLogin);
+
+// Forgot and Reset Password
+router.route("/forgot").post(forgotPassword)
+router.route("/password/reset/:token").put(resetPassword)
 
 router.route("/logout").post(employeeLogout);
 

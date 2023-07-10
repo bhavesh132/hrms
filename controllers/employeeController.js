@@ -3,6 +3,8 @@ const CustomErrorHandler = require('../helpers/CustomErrorHandler');
 const catchAsync = require('../middlewares/catchAsync');
 const ApiFeatures = require('../helpers/apiFeatures');
 const sendToken = require('../helpers/sendToken');
+const sendEmail = require("../helpers/sendEmail")
+const crypto = require("crypto")
 
 // Add an employee
 exports.createEmployee = catchAsync(async (req, res, next)=>{
@@ -45,6 +47,18 @@ exports.getEmployeeDetails = catchAsync(async (req,res,next)=>{
     })
 })
 
+exports.updateEmployeeDetails = catchAsync(async (req, res, next)=> {
+    const employee = await Employee.findOneAndUpdate({_id: req.params.id}, req.body);
+
+    if(!employee){
+        return next(new CustomErrorHandler("Employee Does not Exists!", 404))
+    }
+
+    res.status(200).json({
+        status: success,
+        employee
+    })
+})
 
 // Login a user
 exports.employeeLogin = catchAsync(async (req, res, next)=>{
@@ -84,6 +98,7 @@ exports.employeeLogout = catchAsync(async (req, res, next) => {
     })
 })
 
+// Employee Profile for logged in Employee
 exports.employeeProfile = catchAsync(async (req, res, next)=> {
     const employee = await Employee.findById(req.employee._id)
 
@@ -98,3 +113,72 @@ exports.employeeProfile = catchAsync(async (req, res, next)=> {
 
 });
 
+// Forget Password
+exports.forgotPassword = catchAsync(async (req,res,next)=>{
+    const employee = await Employee.findOne({email: req.body.email})
+
+    if(!employee){
+        return next(new CustomErrorHandler("Email Does not exists!", 404))
+    }
+
+    // Get Reset Password Token
+    const token = await employee.getResetPasswordToken()
+    await employee.save({validateBeforeSave: false})
+
+    const resetPasswordUrl = `${req.protocol}://${req.get("host")}/api/employee/password/reset/${token}`
+
+    console.log(resetPasswordUrl)
+    const message = `<h3>Hi ${employee.firstName}!</h3><p>It seems you are having trouble to sign in to your account. The below link is generated to help you reset your password. Please click on this link to reset your password:</p> 
+    <a href='${resetPasswordUrl}'>Reset Your Password here</a> 
+    \n\n<br>
+    <strong>Note: The link will expire automatically within the next 15 minutes.</strong>`
+
+    try{
+        await sendEmail({
+            email: employee.email,
+            subject: `Password Recovery HRMS`,
+            message,
+        });
+
+        res.status(200).json({
+            status: "success",
+            message: `Email has been successfully sent to ${employee.email}`
+        })
+    }
+    catch (err){
+        employee.resetPasswordToken = undefined
+        employee.resetPasswordExpires = undefined
+        await employee.save({validateBeforeSave: false})
+        return next(new CustomErrorHandler(`Email could not be sent! ${err}`, 500))
+    }
+
+})
+
+// Reset Password response
+exports.resetPassword = catchAsync(async (req,res,next)=>{
+    const resetToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
+
+    const employee = await Employee.findOne({
+        resetPasswordToken: resetToken,
+        resetPasswordExpires: {$gt: Date.now()}
+    });
+
+    if(!employee){
+        return next(new CustomErrorHandler("Reset Password Token is invalid or has expired!", 400))
+    }
+
+    if(req.body.password !== req.body.confirmPassword){
+        return next(new CustomErrorHandler("New Password and Confirm Password Does not match!"))
+    }
+
+    employee.password = req.body.password
+    employee.resetPasswordToken = undefined
+    employee.resetPasswordExpires = undefined
+    await employee.save();
+
+    res.status(201).json({
+        status: "success",
+        message:"Your password has been updated successfully!"
+    })
+
+})

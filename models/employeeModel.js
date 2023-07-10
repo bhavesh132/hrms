@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken")
+const crypto = require("crypto")
 
 const EmployeeSchema = new mongoose.Schema({
     emp_no:{
@@ -65,15 +66,16 @@ const EmployeeSchema = new mongoose.Schema({
         type: String,
         enum: ['Full-Time', 'Part-Time']
     },
+
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
 }, {timestamps: true});
 
 EmployeeSchema.pre('save', async function(next){
 
     if(!this.isModified("password")){
         next();
-        console.log("not called")
     }
-    console.log(this.password)
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(this.password, salt);
     this.password = hashedPassword;
@@ -92,6 +94,18 @@ EmployeeSchema.methods.getJWTToken = async function(){
     })
 
     return token
+}
+
+EmployeeSchema.methods.getResetPasswordToken = function () {
+    // Generating Token
+    const resetToken = crypto.randomBytes(20).toString("hex");
+
+    // Hashing and adding to UserSchema
+    const tokenCrypto = crypto.createHash("sha256").update(resetToken).digest("hex")
+    this.resetPasswordToken = tokenCrypto
+    this.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+
+    return resetToken;
 }
 
 
