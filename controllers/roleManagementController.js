@@ -31,6 +31,31 @@ exports.assignRole = catchAsync(async (req,res,next)=>{
     
 })
 
+exports.removeRole = catchAsync(async (req, res, next)=> {
+    const {role} = req.body;
+
+    const deletedRole = await RoleManagement.deleteOne({role: role});
+
+    if(!role){
+        next(new CustomErrorHandler("Role does not exist!"))
+    }
+    res.status(201).json({
+        success: true,
+        deletedRole
+    })
+})
+
+exports.unassignRole = catchAsync(async (req, res, next)=>{
+    const {role, empID} = req.body
+
+    const appendRole = await RoleManagement.updateOne({role: role}, {$pull: {AssignedEmployee: empID}});
+
+    res.status(201).json({
+        success: true,
+        appendRole
+    })
+})
+
 exports.getRoles = catchAsync(async (req,res,next)=>{
     const roles = await RoleManagement.find();
     const count = await RoleManagement.countDocuments();
