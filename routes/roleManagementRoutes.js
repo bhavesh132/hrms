@@ -17,11 +17,17 @@ router
   .route("/assignRole")
   .post(isAuthenticated, authorizeRoles("System Administrator"), assignRole);
 
-router.route("/removeRole").post(isAuthenticated, authorizeRoles("System Administrator"), removeRole)
+router
+  .route("/removeRole")
+  .delete(isAuthenticated, authorizeRoles("System Administrator"), removeRole);
 
-router.route("/unassignRole").post(isAuthenticated, authorizeRoles("System Administrator", unassignRole))
+router
+  .route("/unassignRole")
+  .put(isAuthenticated, authorizeRoles("System Administrator"), unassignRole);
 
-router.route("/getRoles").get(isAuthenticated, authorizeRoles("System Administrator"), getRoles)
+router
+  .route("/getRoles")
+  .get(isAuthenticated, authorizeRoles("System Administrator"), getRoles);
 
 router.route("/getRoles").get(isAuthenticated, getRoles);
 
