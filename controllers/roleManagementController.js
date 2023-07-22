@@ -2,71 +2,78 @@ const RoleManagement = require("../models/roleManagementModel");
 const catchAsync = require("../middlewares/catchAsync");
 const CustomErrorHandler = require("../helpers/CustomErrorHandler");
 
-exports.createRole = catchAsync(async (req, res, next)=>{
-    const {role} = req.body
-    
-    const createdRole = await RoleManagement.create({
-        role: role
-    });
+exports.createRole = catchAsync(async (req, res, next) => {
+  const { role } = req.body;
 
-    res.status(200).json({
-        status: "success",
-        createdRole
-    })
-})
+  const createdRole = await RoleManagement.create({
+    role: role,
+  });
 
-exports.assignRole = catchAsync(async (req,res,next)=>{
-    const {role, empID} = req.body
+  res.status(200).json({
+    status: "success",
+    createdRole,
+  });
+});
 
-    const appendRole = await RoleManagement.updateOne({role: role}, {$push:{AssignedEmployee: empID}});
+exports.assignRole = catchAsync(async (req, res, next) => {
+  const { role, empID } = req.body;
 
-    if(!appendRole){
-        next(new CustomErrorHandler("No Role Found with the specified value!", 404))
-    }
+  const appendRole = await RoleManagement.updateOne(
+    { role: role },
+    { $push: { AssignedEmployee: empID } }
+  );
 
-    res.status(201).json({
-        status: "success",
-        appendRole
-    })
-    
-})
+  if (!appendRole) {
+    next(
+      new CustomErrorHandler("No Role Found with the specified value!", 404)
+    );
+  }
 
-exports.removeRole = catchAsync(async (req, res, next)=> {
-    const {role} = req.body;
+  res.status(201).json({
+    status: "success",
+    appendRole,
+  });
+});
 
-    const deletedRole = await RoleManagement.deleteOne({role: role});
+exports.removeRole = catchAsync(async (req, res, next) => {
+  const { role } = req.body;
 
-    if(!role){
-        next(new CustomErrorHandler("Role does not exist!"))
-    }
-    res.status(201).json({
-        success: true,
-        deletedRole
-    })
-})
+  const deletedRole = await RoleManagement.deleteOne({ role: role });
 
-exports.unassignRole = catchAsync(async (req, res, next)=>{
-    const {role, empID} = req.body
+  if (!role) {
+    next(new CustomErrorHandler("Role does not exist!"));
+  }
+  res.status(201).json({
+    success: true,
+    deletedRole,
+  });
+});
 
-    const appendRole = await RoleManagement.updateOne({role: role}, {$pull: {AssignedEmployee: empID}});
+exports.unassignRole = catchAsync(async (req, res, next) => {
+  const { role, empID } = req.body;
 
-    res.status(201).json({
-        success: true,
-        appendRole
-    })
-})
+  const appendRole = await RoleManagement.updateOne(
+    { role: role },
+    { $pull: { AssignedEmployee: empID } }
+  );
 
-exports.getRoles = catchAsync(async (req,res,next)=>{
-    const roles = await RoleManagement.find();
-    const count = await RoleManagement.countDocuments();
+  res.status(201).json({
+    success: true,
+    appendRole,
+  });
+});
 
-    if(!roles){
-        next(new CustomErrorHandler("No Roles Created for this system!", 404))
-    }
+exports.getRoles = catchAsync(async (req, res, next) => {
+  const roles = await RoleManagement.find();
+  const count = await RoleManagement.countDocuments();
 
-    res.status(200).json({
-        status: "success",
-        roles,
-        count
-    })
-})
+  if (!roles) {
+    next(new CustomErrorHandler("No Roles Created for this system!", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    roles,
+    count,
+  });
+});
