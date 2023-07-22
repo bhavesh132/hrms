@@ -5,7 +5,6 @@ const documentSchema = new mongoose.Schema({
     title: { type: String, required: true },
     description: { type: String },
     fileUrl: { type: String },
-    uploadDate: { type: Date, default: Date.now }
 },{timestamps: true});
 
 const Document = mongoose.model('Document', documentSchema)

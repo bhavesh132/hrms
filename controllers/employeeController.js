@@ -55,7 +55,7 @@ exports.updateEmployeeDetails = catchAsync(async (req, res, next)=> {
     }
 
     res.status(200).json({
-        status: success,
+        success: true,
         employee
     })
 })
@@ -107,11 +107,31 @@ exports.employeeProfile = catchAsync(async (req, res, next)=> {
     }
 
     res.status(200).json({
-        status: "success",
+        success: true,
         employee
     })
 
 });
+
+exports.updateProfile = catchAsync(async (req, res, next)=> {
+    const employee = await Employee.findById(req.employee._id)
+
+    if(!employee){
+        next(new CustomErrorHandler("Please sign in to access this resource", 401))
+    }
+
+    const update = await Employee.updateOne({_id: req.employee.id}, req.body)
+
+    if(update.modifiedCount === 0){
+        next(new CustomErrorHandler("Unable to update Employee", 400))
+    }
+
+    res.status(200).json({
+        success: true,
+        employee,
+        update
+    })
+})
 
 // Forget Password
 exports.forgotPassword = catchAsync(async (req,res,next)=>{
@@ -141,7 +161,7 @@ exports.forgotPassword = catchAsync(async (req,res,next)=>{
         });
 
         res.status(200).json({
-            status: "success",
+            success: true,
             message: `Email has been successfully sent to ${employee.email}`
         })
     }
@@ -177,7 +197,7 @@ exports.resetPassword = catchAsync(async (req,res,next)=>{
     await employee.save();
 
     res.status(201).json({
-        status: "success",
+        success: true,
         message:"Your password has been updated successfully!"
     })
 

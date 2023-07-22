@@ -10,7 +10,7 @@ exports.createRole = catchAsync(async (req, res, next) => {
   });
 
   res.status(200).json({
-    status: "success",
+    success: true,
     createdRole,
   });
 });
@@ -39,7 +39,7 @@ exports.assignRole = catchAsync(async (req, res, next) => {
   }
 
   res.status(201).json({
-    status: "success",
+    success: true,
     appendRole,
     findRole
   });
@@ -86,7 +86,7 @@ exports.getRoles = catchAsync(async (req, res, next) => {
   }
 
   res.status(200).json({
-    status: "success",
+    success: true,
     roles,
     count,
   });
