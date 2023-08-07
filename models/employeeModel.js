@@ -54,6 +54,9 @@ const EmployeeSchema = new mongoose.Schema({
     supervisor: {
         type: mongoose.Schema.Types.ObjectId, ref: 'Employee'
     },
+    reporting: [{
+        type: mongoose.Schema.Types.ObjectId, ref: 'Employee'
+    }],
     address: {
         street: {type: String},
         city: {type: String},

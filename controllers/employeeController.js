@@ -16,7 +16,6 @@ exports.createEmployee = catchAsync(async (req, res, next)=>{
         })
 });
 
-
 // Get all employees Details --Administrator
 exports.getAllEmployees = catchAsync(async (req, res, next)=>{
     const resultPerPage = 15

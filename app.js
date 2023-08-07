@@ -5,6 +5,7 @@ const errorHandler = require('./middlewares/error');
 const cookieParser = require("cookie-parser")
 const roleManagementRoutes = require('./routes/roleManagementRoutes')
 const employeeRoutes =require('./routes/employeeRoutes');
+const documentRoutes = require('./routes/documentRoutes');
 
 const app = express();
 app.use(express.json());
@@ -17,6 +18,7 @@ app.use(cookieParser())
 // Employee Routes
 app.use('/api/employee', employeeRoutes);
 app.use('/api/role', roleManagementRoutes);
+app.use('api/document', documentRoutes);
 
 
 app.use(errorHandler);

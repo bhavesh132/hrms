@@ -29,8 +29,7 @@ exports.authorizeRoles = (...roles)=> {
             }
             next();
         }else{
-            next(new CustomErrorHandler(`You are not allowed to access this resource!`, 401))
+            next();
         }
-        
     }
 }

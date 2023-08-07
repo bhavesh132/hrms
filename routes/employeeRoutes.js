@@ -32,7 +32,7 @@ router
   )
   .put(
     isAuthenticated,
-    authorizeRoles("System Administrator"),
+    authorizeRoles("System Administrator", "Supervisor"),
     updateEmployeeDetails
   );
 
